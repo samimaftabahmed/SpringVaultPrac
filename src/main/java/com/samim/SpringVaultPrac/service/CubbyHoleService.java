@@ -11,6 +11,7 @@ import org.springframework.vault.support.VaultResponseSupport;
 
 import java.util.UUID;
 
+import static org.springframework.vault.core.VaultKeyValueOperationsSupport.KeyValueBackend.KV_1;
 import static org.springframework.vault.core.VaultKeyValueOperationsSupport.KeyValueBackend.KV_2;
 
 @Service
@@ -28,8 +29,8 @@ public class CubbyHoleService {
     @EventListener(ApplicationReadyEvent.class)
     public void cubbyHoleRead() {
         VaultTemplate vaultTemplate = getVaultTemplate();
-        VaultKeyValueOperations vaultKeyValueOperations = vaultTemplate.opsForKeyValue("cubbyhole/my_confidential", KV_2);
-        VaultResponseSupport<Secrets> responseSupport = vaultKeyValueOperations.get("samim_key", Secrets.class);
+        VaultKeyValueOperations vaultKeyValueOperations = vaultTemplate.opsForKeyValue("cubbyhole/", KV_1);
+        VaultResponseSupport<Secrets> responseSupport = vaultKeyValueOperations.get("my_confidential", Secrets.class);
         if (responseSupport == null) {
             System.out.println("CubbyHole Data not found");
             return;
