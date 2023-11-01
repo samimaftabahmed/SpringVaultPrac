@@ -10,20 +10,15 @@ import org.springframework.vault.authentication.TokenAuthentication;
 import org.springframework.vault.client.VaultEndpoint;
 import org.springframework.vault.config.AbstractVaultConfiguration;
 import org.springframework.vault.core.VaultTemplate;
-import org.springframework.vault.support.VaultTokenRequest;
-import org.springframework.vault.support.VaultTokenResponse;
+import org.springframework.vault.support.VaultToken;
 import org.springframework.web.client.RestOperations;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class VaultConfig extends AbstractVaultConfiguration {
 
     public static VaultEndpoint vaultEndpoint;
     private static RestOperations restOperations;
-    private static VaultTemplate vaultTemplate;
+    public static VaultTemplate vaultTemplate;
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
@@ -44,15 +39,11 @@ public class VaultConfig extends AbstractVaultConfiguration {
         return new TokenAuthentication("mytoken");
     }
 
-    public static CubbyholeAuthentication getCubbyholeAuthentication() {
-        List<String> policies = Arrays.asList("default", "cubbyhole-policy", "cubbyhole-policy-token");
-        VaultTokenRequest tokenRequest = VaultTokenRequest.builder()
-                .ttl(120, TimeUnit.MINUTES).numUses(100).policies(policies).renewable(true)
-                .build();
-        VaultTokenResponse vaultTokenResponse = VaultConfig.vaultTemplate.opsForToken().create(tokenRequest);
+    public static CubbyholeAuthentication getCubbyholeAuthentication(String token) {
         CubbyholeAuthenticationOptions options = CubbyholeAuthenticationOptions.builder()
-                .initialToken(vaultTokenResponse.getToken())
-                .path("cubbyhole/token").build();
+                .initialToken(VaultToken.of(token))
+                .path("cubbyhole/token")
+                .build();
         return new CubbyholeAuthentication(options, VaultConfig.restOperations);
     }
 }
