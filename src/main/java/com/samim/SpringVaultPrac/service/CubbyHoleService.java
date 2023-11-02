@@ -20,12 +20,18 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CubbyHoleService {
 
+    // Not Working
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        String cubbyholeToken = getCubbyholeToken().getToken().getToken();
-        String uuid = UUID.randomUUID().toString();
-        cubbyHoleWrite(uuid, cubbyholeToken);
-        cubbyHoleRead(uuid, cubbyholeToken);
+        try {
+            String cubbyholeToken = getCubbyholeToken().getToken().getToken();
+            String uuid = UUID.randomUUID().toString();
+            cubbyHoleWrite(uuid, cubbyholeToken);
+            cubbyHoleRead(uuid, cubbyholeToken);
+
+        } catch (Throwable t) {
+            System.err.println(Arrays.toString(t.getStackTrace()));
+        }
     }
 
     public void cubbyHoleWrite(String uuid, String token) {
@@ -54,7 +60,7 @@ public class CubbyHoleService {
         return new VaultTemplate(VaultConfig.vaultEndpoint, VaultConfig.getCubbyholeAuthentication(token));
     }
 
-    private VaultTokenResponse getCubbyholeToken(){
+    private VaultTokenResponse getCubbyholeToken() {
         List<String> policies = Arrays.asList("default", "cubbyhole-policy", "cubbyhole-policy-token");
         VaultTokenRequest tokenRequest = VaultTokenRequest.builder()
                 .ttl(10, TimeUnit.MINUTES).numUses(2).policies(policies).renewable(true)
