@@ -38,8 +38,8 @@ public class CubbyHoleService {
             System.out.println("--Running init::CubbyHoleService");
             String cubbyholeToken = getCubbyholeToken().getToken().getToken();
             String uuid = UUID.randomUUID().toString();
-            cubbyholeWrite(uuid, cubbyholeToken, true);
-            cubbyholeRead(uuid, cubbyholeToken, true);
+            cubbyholeWrite(uuid, cubbyholeToken, true); // FAILS
+            cubbyholeRead(uuid, cubbyholeToken, true); // FAILS
 
         } catch (Exception t) {
             System.err.println(t.getMessage());
