@@ -17,7 +17,6 @@ public class VaultConfig extends AbstractVaultConfiguration {
 
     private static RestOperations restOperations;
 
-    @Bean
     @Override
     public VaultTemplate vaultTemplate() {
         return super.vaultTemplate();
