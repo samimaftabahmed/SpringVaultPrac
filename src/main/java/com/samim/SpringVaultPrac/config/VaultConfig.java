@@ -39,6 +39,10 @@ public class VaultConfig extends AbstractVaultConfiguration {
         return new TokenAuthentication("mytoken");
     }
 
+    public static ClientAuthentication getTokenAuthentication(String token) {
+        return new TokenAuthentication(token);
+    }
+
     public static CubbyholeAuthentication getCubbyholeAuthentication(String token) {
         CubbyholeAuthenticationOptions options = CubbyholeAuthenticationOptions.builder()
                 .initialToken(VaultToken.of(token))
