@@ -1,8 +1,7 @@
 package com.samim.SpringVaultPrac.config;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.vault.authentication.ClientAuthentication;
 import org.springframework.vault.authentication.CubbyholeAuthentication;
 import org.springframework.vault.authentication.CubbyholeAuthenticationOptions;
@@ -16,22 +15,27 @@ import org.springframework.web.client.RestOperations;
 @Configuration
 public class VaultConfig extends AbstractVaultConfiguration {
 
-    public static VaultEndpoint vaultEndpoint;
     private static RestOperations restOperations;
-    public static VaultTemplate vaultTemplate;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void init() {
-        VaultConfig.restOperations = restOperations();
-        VaultConfig.vaultEndpoint = vaultEndpoint();
-        VaultConfig.vaultTemplate = vaultTemplate();
+    @Bean
+    @Override
+    public VaultTemplate vaultTemplate() {
+        return super.vaultTemplate();
     }
 
+    @Bean
     @Override
     public VaultEndpoint vaultEndpoint() {
         VaultEndpoint vaultEndpoint = VaultEndpoint.create("localhost", 8200);
         vaultEndpoint.setScheme("http");
         return vaultEndpoint;
+    }
+
+    @Bean
+    @Override
+    public RestOperations restOperations() {
+        restOperations = super.restOperations();
+        return restOperations;
     }
 
     @Override

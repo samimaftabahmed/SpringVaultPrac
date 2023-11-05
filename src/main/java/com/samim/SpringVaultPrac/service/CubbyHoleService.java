@@ -3,10 +3,12 @@ package com.samim.SpringVaultPrac.service;
 import com.github.javafaker.Faker;
 import com.samim.SpringVaultPrac.config.VaultConfig;
 import com.samim.SpringVaultPrac.data.Secrets;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.authentication.ClientAuthentication;
+import org.springframework.vault.client.VaultEndpoint;
 import org.springframework.vault.core.VaultKeyValueOperations;
 import org.springframework.vault.core.VaultKeyValueOperationsSupport;
 import org.springframework.vault.core.VaultTemplate;
@@ -24,6 +26,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CubbyHoleService {
 
     private final AtomicInteger counter = new AtomicInteger(0);
+
+    @Autowired
+    private VaultTemplate vaultTemplate;
+    @Autowired
+    private VaultEndpoint vaultEndpoint;
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
@@ -75,7 +82,7 @@ public class CubbyHoleService {
             clientAuthentication = VaultConfig.getTokenAuthentication(token);
         }
 
-        return new VaultTemplate(VaultConfig.vaultEndpoint, clientAuthentication);
+        return new VaultTemplate(vaultEndpoint, clientAuthentication);
     }
 
     public VaultTokenResponse getCubbyholeToken() {
@@ -83,7 +90,7 @@ public class CubbyHoleService {
         VaultTokenRequest tokenRequest = VaultTokenRequest.builder()
                 .ttl(10, TimeUnit.MINUTES).numUses(4).policies(policies).renewable(true)
                 .build();
-        return VaultConfig.vaultTemplate.opsForToken().create(tokenRequest);
+        return vaultTemplate.opsForToken().create(tokenRequest);
     }
 
     private void printDetails(String uuid, String token) {
