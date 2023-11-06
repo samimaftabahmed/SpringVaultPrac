@@ -8,7 +8,6 @@ import org.springframework.vault.authentication.CubbyholeAuthenticationOptions;
 import org.springframework.vault.authentication.TokenAuthentication;
 import org.springframework.vault.client.VaultEndpoint;
 import org.springframework.vault.config.AbstractVaultConfiguration;
-import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.support.VaultToken;
 import org.springframework.web.client.RestOperations;
 
@@ -16,11 +15,6 @@ import org.springframework.web.client.RestOperations;
 public class VaultConfig extends AbstractVaultConfiguration {
 
     private static RestOperations restOperations;
-
-    @Override
-    public VaultTemplate vaultTemplate() {
-        return super.vaultTemplate();
-    }
 
     @Bean
     @Override
