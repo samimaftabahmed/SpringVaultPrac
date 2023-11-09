@@ -4,8 +4,6 @@ import com.github.javafaker.Faker;
 import com.samim.SpringVaultPrac.config.VaultConfig;
 import com.samim.SpringVaultPrac.data.Secrets;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.authentication.ClientAuthentication;
 import org.springframework.vault.client.VaultEndpoint;
@@ -32,7 +30,7 @@ public class CubbyHoleService {
     @Autowired
     private VaultEndpoint vaultEndpoint;
 
-    @EventListener(ApplicationReadyEvent.class)
+//    @EventListener(ApplicationReadyEvent.class)
     public void init() {
         try {
             System.out.println("--Running init::CubbyHoleService");
