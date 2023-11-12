@@ -7,10 +7,6 @@ import com.samim.SpringVaultPrac.data.Secrets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.authentication.TokenAuthentication;
 import org.springframework.vault.client.VaultEndpoint;
@@ -19,9 +15,11 @@ import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.support.VaultResponse;
 import org.springframework.vault.support.VaultResponseSupport;
 import org.springframework.vault.support.VaultToken;
+import org.springframework.vault.support.WrappedMetadata;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
@@ -91,18 +89,26 @@ public class VaultService {
     }
 
     public void responseWrappingTheSecrets(String uuid) throws JsonProcessingException {
-        ResponseEntity<VaultResponse> response = vaultTemplate.doWithSession(restOperations -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("X-Vault-Wrap-TTL", "10m");
-            return restOperations.exchange("secret/data/" + uuid,
-                    HttpMethod.GET, new HttpEntity<>(headers), VaultResponse.class);
-        });
+//        TYPE: 1
+//        ResponseEntity<VaultResponse> response = vaultTemplate.doWithSession(restOperations -> {
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add("X-Vault-Wrap-TTL", "10m");
+//            return restOperations.exchange("secret/data/" + uuid,
+//                    HttpMethod.GET, new HttpEntity<>(headers), VaultResponse.class);
+//        });
+//        Map<String, String> wrapInfo = response.getBody().getWrapInfo();
+//        VaultToken vaultToken = VaultToken.of(wrapInfo.get("token"));
 
-        Map<String, String> wrapInfo = response.getBody().getWrapInfo();
+//        TYPE: 2
+        VaultKeyValueOperations vaultKeyValueOperations = vaultTemplate.opsForKeyValue("secret", KV_2);
+        VaultResponseSupport<Secrets> responseSupport = vaultKeyValueOperations.get(uuid, Secrets.class);
+        WrappedMetadata wrappedMetadata = vaultTemplate.opsForWrapping().wrap(responseSupport.getData(), Duration.ofMinutes(10));
+        VaultToken vaultToken = wrappedMetadata.getToken();
+
         // token to unwrap the response
-        VaultToken vaultToken = VaultToken.of(wrapInfo.get("token"));
         VaultResponse vaultResponse = vaultTemplate.opsForWrapping().read(vaultToken);
         if (vaultResponse != null) {
+            System.out.println("Token: " + vaultToken.getToken());
             Map<String, String> map = (Map<String, String>) vaultResponse.getData().get("data");
             Secrets secrets = new ObjectMapper().convertValue(map, Secrets.class);
             System.out.println(secrets);
