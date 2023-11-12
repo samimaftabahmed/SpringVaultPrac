@@ -77,7 +77,7 @@ public class VaultService {
     }
 
     public void getAndDelete(String uuid) {
-        VaultKeyValueOperations vaultKeyValueOperations = vaultTemplate.opsForKeyValue("secret/", KV_2);
+        VaultKeyValueOperations vaultKeyValueOperations = vaultTemplate.opsForKeyValue("secret", KV_2);
         VaultResponseSupport<Secrets> responseSupport = vaultKeyValueOperations.get(uuid, Secrets.class);
         if (responseSupport == null) {
             System.out.println("Secret Data not found");
